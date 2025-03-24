@@ -1,5 +1,10 @@
 const mongoose = require('mongoose');
-const Question = require('../models/questionModels.js');
+const slugify = require('slugify');
+const sanitizeHtml = require('sanitize-html');
+const removeAccents = require('remove-accents');
+
+const { Question, searchIndex } = require('../models/questionModels.js');
+const { search } = require('../services/searchService.js');
 
 const QuestionControllers = {
     createQuestion: async (req, res) => {
@@ -11,10 +16,16 @@ const QuestionControllers = {
             if (!userId || !title || !content || !subject || !tags) {
                 return res.status(404).json({ message: 'Thiếu dữ liệu' });
             }
+            const cleanContent = sanitizeHtml(content, {
+                allowedTags: ['a', 'p', 'h1', 'em'],
+                allowedAttributes: { a: ['href'] },
+            });
+            const slug = slugify(title, { lower: true, strict: true });
             const questions = new Question({
                 userId,
                 title,
-                content,
+                slug,
+                content: cleanContent,
                 subject,
                 tags,
             });
@@ -29,18 +40,31 @@ const QuestionControllers = {
         try {
             const questions = await Question.find();
             res.status(200).json(questions);
+            
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });
         }
     },
-    getQuestionById: async (req, res) => {
+    getQuestionBySlug: async (req, res) => {
         try {
-            const { id } = req.params;
-            
-            const question = await Question.findById(id);
-            if (!question) return res.status(404).json({ message: 'Khồn tìm thấy dữ liệu' });
+            const { slug } = req.params;
+            const question = await Question.findOne({ slug });
+            if (!question) return res.status(404).json({ message: 'Không tìm thấy dữ liệu' });
             res.status(200).json(question);
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
+    searchQuestion: async (req, res) => {
+        try {
+            let query = req.params.q;
+            if (!query) return res.status(400).json({ message: 'Thiếu từ khóa' });
+            query = removeAccents(query.toLowerCase());
+            console.log('Query :', query);
+            const ketqua = search(query);
+            res.json(ketqua);
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });

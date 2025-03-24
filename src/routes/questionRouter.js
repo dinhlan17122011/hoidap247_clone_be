@@ -6,7 +6,9 @@ router.post('/addQuestion', QuestionControllers.createQuestion);
 
 router.get('/', QuestionControllers.getQuestion);
 
-router.get('/:id', QuestionControllers.getQuestionById);
+router.get('/:slug', QuestionControllers.getQuestionBySlug);
+
+router.get('/search', QuestionControllers.searchQuestion);
 
 router.put('/:id', QuestionControllers.updateQuestion);
 
