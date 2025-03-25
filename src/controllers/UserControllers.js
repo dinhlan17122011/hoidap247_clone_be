@@ -79,6 +79,7 @@ const UserController = {
             if (!decodePassword) {
                 return res.status(500).json({ message: 'Sai mặt khẩu' });
             }
+            req.session.userId = User._id;
             const token = jwt.sign({ id: User._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
             res.status(200).json({
                 message: 'Đăng nhập thành công',

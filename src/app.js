@@ -26,6 +26,25 @@ const QuestionViewsRoutes = require('./routes/views/QuestionsViewsRouter.js');
 const AnswerViewsRoutes = require('./routes/views/AnswerViewsRoutes.js');
 const CommentViewsRouter = require('./routes/views/CommentViewsRouter.js');
 
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+
+app.use(cookieParser(process.env.COOKIE_SECRET || 'defaultsecret'));
+
+// Cấu hình express-session
+app.use(
+    session({
+        secret: process.env.SESSION_SECRET || 'defaultsecret',
+        resave: false,
+        saveUninitialized: false,
+        cookie: {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            maxAge: 3600000, // 1 giờ
+        },
+    }),
+);
+
 app.use(morgan('combined'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -65,7 +84,7 @@ app.use('/api/user', UserRouters);
 app.use('/api/question', questionRouter);
 app.use('/api/answer', answerRoutes);
 app.use('/api/comment', CommentRoutes);
-app.use('/comment',CommentViewsRouter)
+app.use('/comment', CommentViewsRouter);
 
 //ROUTER VIEWS
 app.use('/user', UserViewsRouter);
