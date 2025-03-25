@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express();
-const CommentControllers = require('../controllers/CommentControllers.js');
+const { CommentControllers } = require('../../controllers/CommentControllers.js');
 
 router.post('/addComment', CommentControllers.createComment);
 

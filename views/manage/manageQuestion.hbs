@@ -1,0 +1,43 @@
+<h2 style='text-align: center; '>QUẢN LÍ CÂU HỎI</h2>
+
+<table class='table'>
+    <thead>
+        <tr>
+            <th scope='col'>ID câu hỏi</th>
+            <th scope='col'>ID User</th>
+            <th scope='col'>Title</th>
+            <th scope='col'>Nội dung</th>
+            <th scope='col'>Môn học</th>
+            <th scope='col'>Answers Count</th>
+            <th scope='col'>Chức năng</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each questions}}
+        <tr>
+            <td>{{this._id}}</td>
+            <td>{{this.userId}}</td>
+            <td>{{this.title}}</td>
+            <td>{{this.content}}</td>
+            <td>{{this.subject}}</td>
+            <td>{{this.answersCount}}</td>
+            <td>
+                 <td>
+                    <a class='btn btn-warning' href='/question/{{this.slug}}'>Xem chi tiết</a>
+                    <form
+                        action='/api/question/{{this._id}}?_method=DELETE'
+                        method='POST'
+                        style='display:inline;'
+                    >
+                        <button
+                            type='submit'
+                            class='btn btn-danger'
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');"
+                        >
+                            Xóa
+                        </button>
+                    </form>
+            </td>
+        </tr>
+        {{/each}}
+</table>

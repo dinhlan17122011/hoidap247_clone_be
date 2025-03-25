@@ -40,7 +40,6 @@ const QuestionControllers = {
         try {
             const questions = await Question.find();
             res.status(200).json(questions);
-            
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });
@@ -92,7 +91,7 @@ const QuestionControllers = {
                 return res.status(400).json({ message: 'ID không hợp lệ' });
             }
             await Question.findByIdAndDelete(id);
-            res.status(200).json({ message: `Đã xóa thành công câu hỏi vời id: ${id}` });
+            res.redirect('/question')
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });
@@ -100,4 +99,29 @@ const QuestionControllers = {
     },
 };
 
-module.exports = QuestionControllers;
+const QuestionViews = {
+    manageQuestion: async (req, res) => {
+        try {
+            const questions = await Question.find().lean();
+            console.log(questions);
+
+            res.render('manage/manageQuestion', { questions });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
+    detailsQuestion: async (req, res) => {
+        try {
+            const { slug } = req.params;
+            const question = await Question.findOne({ slug }).lean();
+            if (!question) return res.status(404).json({ message: 'Không tìm thấy dữ liệu' });
+            res.render('details/detailsQuestion', { question });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
+};
+
+module.exports = { QuestionControllers, QuestionViews };

@@ -1,0 +1,36 @@
+<h2 style='text-align: center; '>QUẢN LÍ NGƯỜI DÙNG</h2>
+<table class='table'>
+    <thead>
+        <tr>
+            <th>ID người dùng</th>
+            <th>Tên người dùng</th>
+            <th>Email</th>
+            <th>Chức năng</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each users}}
+            <tr>
+                <td>{{this._id}}</td>
+                <td>{{this.username}}</td>
+                <td>{{this.email}}</td>
+                <td>
+                    <a class='btn btn-warning' href='/user/{{this._id}}'>Xem chi tiết</a>
+                    <form
+                        action='/api/user/{{this._id}}?_method=DELETE'
+                        method='POST'
+                        style='display:inline;'
+                    >
+                        <button
+                            type='submit'
+                            class='btn btn-danger'
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');"
+                        >
+                            Xóa
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

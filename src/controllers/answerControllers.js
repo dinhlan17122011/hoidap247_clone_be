@@ -1,4 +1,5 @@
 const Answer = require('../models/answerModels.js');
+const {Question} = require('../models/questionModels.js');
 const mongoose = require('mongoose');
 
 const AnswerControllers = {
@@ -13,6 +14,7 @@ const AnswerControllers = {
                 userId,
                 content,
             });
+            await Question.findByIdAndUpdate(questionId,{$inc:{answersCount:1}})
             await answer.save();
             res.status(201).json({ message: 'Thành công', answer });
         } catch (error) {
@@ -63,4 +65,9 @@ const AnswerControllers = {
     },
 };
 
-module.exports = AnswerControllers;
+const AnswerViews = {
+    manageAnswer: async (req, res) => {},
+    detailsAnswer: async (req, res) => {},
+};
+
+module.exports = { AnswerControllers, AnswerViews };

@@ -69,4 +69,9 @@ const CommentControllers = {
     },
 };
 
-module.exports = CommentControllers;
+const CommentViews = {
+    manageComment: async (req, res) => {},
+    detailsComment: async (req, res) => {},
+};
+
+module.exports = { CommentControllers, CommentViews };

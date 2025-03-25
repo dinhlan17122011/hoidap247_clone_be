@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express();
-const QuestionControllers = require('../controllers/QuestionControllers.js');
+const { QuestionControllers } = require('../../controllers/QuestionControllers.js');
 
 router.post('/addQuestion', QuestionControllers.createQuestion);
 

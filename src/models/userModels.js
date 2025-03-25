@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
@@ -11,6 +12,12 @@ const userSchema = new Schema({
     verificationCode: { type: String },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
+});
+
+userSchema.pre('save', (next) => {
+    if (!this.username) return next();
+    this.slug = slugify(this.title, { lower: true, strict: true });
+    next();
 });
 
 const User = mongoose.model('User', userSchema);
