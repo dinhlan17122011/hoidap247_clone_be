@@ -74,4 +74,4 @@ const CommentViews = {
     detailsComment: async (req, res) => {},
 };
 
-module.exports = { CommentControllers, CommentViews };
+module.exports = { CommentControllers, CommentViews }

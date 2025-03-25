@@ -68,6 +68,6 @@ const AnswerControllers = {
 const AnswerViews = {
     manageAnswer: async (req, res) => {},
     detailsAnswer: async (req, res) => {},
-};
+}
 
-module.exports = { AnswerControllers, AnswerViews };
+module.exports = { AnswerControllers, AnswerViews }
