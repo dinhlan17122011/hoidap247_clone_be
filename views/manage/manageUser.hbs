@@ -1,4 +1,12 @@
 <h2 style='text-align: center; '>QUẢN LÍ NGƯỜI DÙNG</h2>
+{{! Ô tìm kiếm  }}
+<div style='text-align: center; '>
+    <form method='GET' action='/user'>
+        <input type='text' name='search' value='{{search}}' placeholder='Nhập tên hoặc email' />
+        <button type='submit'>Tìm kiếm</button>
+    </form>
+</div>
+{{! Bảng dữ liệu }}
 <table class='table'>
     <thead>
         <tr>

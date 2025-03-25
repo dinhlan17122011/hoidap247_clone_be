@@ -1,4 +1,5 @@
 const Comment = require('../models/commentModels.js');
+const Answer = require('../models/answerModels.js');
 const mongoose = require('mongoose');
 
 const CommentControllers = {
@@ -14,11 +15,15 @@ const CommentControllers = {
             if (!userId || !answerId || !content) {
                 return res.status(404).json({ message: 'Thiếu dữ liệu' });
             }
+            const answer = await Answer.findById(answerId);
+            const answerTitle = answer.content;
             const comment = new Comment({
                 userId,
                 answerId,
                 content,
+                answerTitle: answerTitle,
             });
+            await Answer.findByIdAndUpdate(answerId, { $inc: { commentCount: 1 } });
             await comment.save();
             res.status(201).json({ message: 'Thành công !', data: comment });
         } catch (error) {
@@ -61,7 +66,8 @@ const CommentControllers = {
                 return res.status(400).json({ message: 'ID không hợp lệ' });
             }
             await Comment.findByIdAndDelete(id);
-            res.status(200).json({ message: `Đã xóa thành công bình luận vời id: ${id}` });
+            res.redirect('/comment');
+            // res.status(200).json({ message: `Đã xóa thành công bình luận vời id: ${id}` });
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });
@@ -70,8 +76,34 @@ const CommentControllers = {
 };
 
 const CommentViews = {
-    manageComment: async (req, res) => {},
-    detailsComment: async (req, res) => {},
+    manageComment: async (req, res) => {
+        try {
+            const { search } = req.query;
+            let comments;
+            if (search) {
+                comments = await Comment.find({
+                    $or: [{ answerTitle: { $regex: search, $options: 'i' } }],
+                }).lean();
+            } else {
+                comments = await Comment.find().lean();
+            }
+            res.render('manage/manageComment', { comments });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
+    detailsComment: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const comment = await Comment.findById(id).lean();
+            if (!comment) return res.status(404).json({ message: 'Không tìm thấy dữ liệu' });
+            res.render('details/detailsComment', { comment });
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
 };
 
-module.exports = { CommentControllers, CommentViews }
+module.exports = { CommentControllers, CommentViews };

@@ -91,7 +91,7 @@ const QuestionControllers = {
                 return res.status(400).json({ message: 'ID không hợp lệ' });
             }
             await Question.findByIdAndDelete(id);
-            res.redirect('/question')
+            res.redirect('/question');
         } catch (error) {
             console.log(error);
             res.status(500).json({ message: 'Lỗi server', error: error });
@@ -102,9 +102,17 @@ const QuestionControllers = {
 const QuestionViews = {
     manageQuestion: async (req, res) => {
         try {
-            const questions = await Question.find().lean();
-            console.log(questions);
-
+            const { search } = req.query;
+            let questions;
+            if (search) {
+                questions = await Question.find({
+                    $or: [
+                        { title: { $regex: search, $options: 'i' } },
+                    ],
+                }).lean();
+            } else {
+                questions = await Question.find().lean();
+            }
             res.render('manage/manageQuestion', { questions });
         } catch (error) {
             console.log(error);

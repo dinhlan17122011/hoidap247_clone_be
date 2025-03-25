@@ -2,7 +2,7 @@ const User = require('../models/userModels.js');
 
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose')
+const mongoose = require('mongoose');
 
 const sendVerificationEmail = require('../utils/emailService.js');
 
@@ -105,26 +105,35 @@ const UserController = {
         }
     },
     deleteUser: async (req, res) => {
-            try {
-                const { id } = req.params;
-                if (!mongoose.Types.ObjectId.isValid(id)) {
-                    return res.status(400).json({ message: 'ID không hợp lệ' });
-                }
-                await User.findByIdAndDelete(id);
-                res.redirect('/user')
-            } catch (error) {
-                console.log(error);
-                res.status(500).json({ message: 'Lỗi server', error: error });
+        try {
+            const { id } = req.params;
+            if (!mongoose.Types.ObjectId.isValid(id)) {
+                return res.status(400).json({ message: 'ID không hợp lệ' });
             }
-        },
+            await User.findByIdAndDelete(id);
+            res.redirect('/user');
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ message: 'Lỗi server', error: error });
+        }
+    },
 };
 
 const UserViews = {
     manageUser: async (req, res) => {
         try {
-            const users = await User.find().lean();
-            console.log(users);
-
+            const { search } = req.query;
+            let users;
+            if (search) {
+                users = await User.find({
+                    $or: [
+                        { username: { $regex: search, $options: 'i' } },
+                        { email: { $regex: search, $options: 'i' } },
+                    ],
+                }).lean();
+            } else {
+                users = await User.find().lean();
+            }
             res.render('manage/manageUser', { users });
         } catch (error) {
             console.log(error);
@@ -135,8 +144,6 @@ const UserViews = {
         try {
             const { id } = req.params;
             const users = await User.findById(id).lean();
-            console.log(users);
-
             res.render('details/detalsUser', { user: users });
         } catch (error) {
             console.log(error);

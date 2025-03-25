@@ -1,0 +1,75 @@
+<h2 style='text-align: center;'>QUẢN LÍ BÌNH LUẬN</h2>
+
+<div style='text-align: center;'>
+    <form method='GET' action='/answer'>
+        <input type='text' name='search' value='{{search}}' placeholder='Nhập tên hoặc email' />
+        <button type='submit'>Tìm kiếm</button>
+    </form>
+</div>
+
+<table class='table'>
+    <thead>
+        <tr>
+            <th scope='col'>ID bình luận</th>
+            <th scope='col'>ID User</th>
+            <th scope='col'>ID câu trả lời</th>
+            <th scope='col'>Nội dung câu hỏi</th>
+            <th scope='col'>Nội dung trả lời</th>
+            <th scope='col'>Chức năng</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{#each comments}}
+            <tr>
+                <td class='shorten-id'>{{this._id}}</td>
+                <td class='shorten-id'>{{this.userId}}</td>
+                <td class='shorten-id'>{{this.answerId}}</td>
+                <td>{{this.answerTitle}}</td>
+                <td>{{this.content}}</td>
+                <td>
+                    <a class='btn btn-warning' href='/comment/{{this._id}}'>Xem chi tiết</a>
+                    <form
+                        action='/api/comment/{{this._id}}?_method=DELETE'
+                        method='POST'
+                        style='display:inline;'
+                    >
+                        <button
+                            type='submit'
+                            class='btn btn-danger'
+                            onclick="return confirm('Bạn có chắc chắn muốn xóa?');"
+                        >
+                            Xóa
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let idElements = document.querySelectorAll(".shorten-id");
+
+    idElements.forEach((element) => {
+        let fullText = element.innerText.trim();
+        let maxLength = 12; // Giữ lại 12 ký tự đầu
+
+        if (fullText.length > 14) {
+            let shortenedText = fullText.substring(0, maxLength) + "........";
+            element.setAttribute("data-full-text", fullText); // Lưu lại ID đầy đủ
+            element.innerText = shortenedText;
+
+            // Khi di chuột vào, hiện ID đầy đủ
+            element.addEventListener("mouseenter", function() {
+                this.innerText = this.getAttribute("data-full-text");
+            });
+
+            // Khi rời chuột, quay lại dạng rút gọn
+            element.addEventListener("mouseleave", function() {
+                this.innerText = shortenedText;
+            });
+        }
+    });
+});
+</script>
