@@ -10,13 +10,14 @@ const userSchema = new Schema({
     status: { type: String, required: true, enum: ['Xác thực', 'Chưa xác thực'] },
     points: { type: Number, required: true },
     verificationCode: { type: String },
+    avatar: { type: String, default: null }, // Thêm trường avatar
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date, default: Date.now },
 });
 
-userSchema.pre('save', (next) => {
+userSchema.pre('save', function (next) {
     if (!this.username) return next();
-    this.slug = slugify(this.title, { lower: true, strict: true });
+    this.slug = slugify(this.username, { lower: true, strict: true });
     next();
 });
 

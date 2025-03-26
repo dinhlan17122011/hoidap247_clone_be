@@ -1,10 +1,31 @@
 const User = require('../models/userModels.js');
 
+const path = require('path');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const multer = require('multer');
+const fs = require('fs');
 const mongoose = require('mongoose');
 
 const sendVerificationEmail = require('../utils/emailService.js');
+
+const uploadDir = path.join(__dirname, '../uploads/avatars/');
+
+// Kiểm tra nếu thư mục chưa tồn tại thì tạo mới
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir); // Lưu vào thư mục đã kiểm tra
+    },
+    filename: (req, file, cb) => {
+        cb(null, Date.now() + path.extname(file.originalname)); // Đặt tên file duy nhất
+    }
+});
+
+const upload = multer({ storage: storage }).single('avatar');
 
 const UserController = {
     register: async (req, res) => {
@@ -91,20 +112,55 @@ const UserController = {
             res.status(500).json({ message: 'Lỗi server', error: error });
         }
     },
+    upload: async (req, res) => {
+        upload(req, res, async (err) => {
+            if (err) {
+                return res.status(400).json({ message: err.message });
+            }
+            if (!req.file) {
+                return res.status(400).json({ message: 'Vui lòng chọn ảnh' });
+            }
+
+            try {
+                const userId = req.params.id;
+                const user = await User.findById(userId);
+                if (!user) {
+                    return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+                }
+
+                // Cập nhật ảnh đại diện
+                user.avatar = `/uploads/avatars/${req.file.filename}`;
+                await user.save();
+
+                res.status(200).json({
+                    message: 'Cập nhật ảnh đại diện thành công',
+                    avatarUrl: user.avatar,
+                });
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ message: 'Lỗi server', error });
+            }
+        });
+    },
     profileUser: async (req, res) => {
         try {
             const { id } = req.params;
-            const profile = await User.findById(id);
+            const profile = await User.findById(id).lean();
             if (!profile) return res.status(404).json({ message: 'Không tìm thấy tài khoản' });
-            res.status(200).json({
-                message: `Profile của người dùng ${profile.username}`,
-                profile,
+    
+            res.render('details/detalsUser', {
+                user: {
+                    ...profile,
+                    avatar: profile.avatar
+                        ? `http://localhost:5000${profile.avatar}`
+                        : '/uploads/avatars/default.png', // Thêm ảnh mặc định nếu không có avatar
+                }
             });
         } catch (error) {
             console.log(error);
-            res.status(500).json({ message: 'Lỗi server', error: error });
+            res.status(500).json({ message: 'Lỗi server', error });
         }
-    },
+    },    
     deleteUser: async (req, res) => {
         try {
             const { id } = req.params;
@@ -153,4 +209,4 @@ const UserViews = {
     },
 };
 
-module.exports = { UserController, UserViews };
+module.exports = { UserController, UserViews, upload };

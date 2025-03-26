@@ -1,8 +1,10 @@
-<h2 style="text-align: center; ">Dữ liệu người dùng : {{user.username}} </h2>
-<button><a href='/user'>Quay lại</a></button>
-<p><strong>_ID:</strong>{{user._id}}</p>
+<h2 style="text-align: center;">Dữ liệu người dùng: {{user.username}}</h2>
+<button><a href="/user">Quay lại</a></button>
+<p><strong>_ID:</strong> {{user._id}}</p>
 <p><strong>Tên người dùng:</strong> {{user.username}}</p>
-<p><strong>Email</strong>:{{user.email}}</p>
-<p><strong>Trạng thái xác thực :</strong> {{user.status}}</p>
-<p><strong>Role : </strong>{{user.role}}</p>
-<p><strong>Points : </strong>{{user.points}}</p>
+<p><strong>Email:</strong> {{user.email}}</p>
+<p><strong>Trạng thái xác thực:</strong> {{user.status}}</p>
+<p><strong>Role:</strong> {{user.role}}</p>
+<p><strong>Points:</strong> {{user.points}}</p>
+<p><strong>Ảnh đại diện:</strong></p>
+<img src="{{#if user.avatar}}http://localhost:3000{{user.avatar}}{{else}}http://localhost:3000/uploads/avatars/macdinh.jpq{{/if}}" alt="Avatar" width="200"  style="border-radius: 50%; border: 2px solid #ddd;">

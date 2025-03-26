@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express();
-const { UserController } = require('../../controllers/UserControllers.js');
+const { UserController, upload } = require('../../controllers/UserControllers.js');
 
 router.post('/register', UserController.register);
 
@@ -10,6 +10,8 @@ router.post('/verifyEmail', UserController.verifyEmail);
 
 router.get('/profile/:id', UserController.profileUser);
 
-router.delete('/:id', UserController.deleteUser);
+router.post('/upload-avatar/:id', UserController.upload);
+
+router.post('/upload-avatar/:id', upload, UserController.upload);
 
 module.exports = router;
